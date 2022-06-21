@@ -25,30 +25,43 @@ function App() {
   };
 
   const handleAddItem = () => {
-    axios.post(`${BACKEND_URL}`, {
-        content:itemToAdd,
-        done: false
-    }).then((response) => {
+    axios.post(`https://api.todoist.com/rest/v1/tasks`, 
+      {
+        content: itemToAdd,
+        priority: 2
+      },
+      {
+        headers:
+          { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ffc4c81a6a3aa9ae100b7f4dc0a15f2d730a6acc`
+          }
+      }
+    ).then((response) => {
+        console.log(response.data);
         setItems([ ...items, response.data])
     })
     setItemToAdd("");
   };
 
 
-  const toggleItemDone = ({ id, done }) => {
-      axios.put(`${BACKEND_URL}${id}`, {
-          done: !done
+  const toggleItemDone = ({ id, completed }) => {
+      axios.post(`${BACKEND_URL}/${id}/close`,{completed: !completed},
+      {
+        headers: 
+        {
+          Authorization: `Bearer ffc4c81a6a3aa9ae100b7f4dc0a15f2d730a6acc`
+        }
       }).then((response) => {
           setItems(items.map((item) => {
               if (item.id === id) {
                   return {
                       ...item,
-                      done: !done
+                      completed: !completed
                   }
               }
               return item
           }))
-
       })
   };
 
