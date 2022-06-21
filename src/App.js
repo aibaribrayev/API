@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import "./App.css";
 import axios from "axios";
 
-const BACKEND_URL = "http://10.65.132.54:3000";
+const BACKEND_URL = "https://api.todoist.com/rest/v1/tasks";
 
 /*
 * Plan:
@@ -10,7 +10,7 @@ const BACKEND_URL = "http://10.65.132.54:3000";
 *   2. Get items and show them +
 *   3. Toggle item done +
 *   4. Handle item add +
-*   5. Delete +
+*   5. Delete +d
 *   6. Filter
 *
 * */
@@ -25,8 +25,8 @@ function App() {
   };
 
   const handleAddItem = () => {
-    axios.post(`${BACKEND_URL}/todos`, {
-        label:itemToAdd,
+    axios.post(`${BACKEND_URL}`, {
+        content:itemToAdd,
         done: false
     }).then((response) => {
         setItems([ ...items, response.data])
@@ -36,7 +36,7 @@ function App() {
 
 
   const toggleItemDone = ({ id, done }) => {
-      axios.put(`${BACKEND_URL}/todos/${id}`, {
+      axios.put(`${BACKEND_URL}${id}`, {
           done: !done
       }).then((response) => {
           setItems(items.map((item) => {
@@ -55,7 +55,7 @@ function App() {
   // N => map => N
     // N => filter => 0...N
   const handleItemDelete = (id) => {
-      axios.delete(`${BACKEND_URL}/todos/${id}`).then((response) => {
+      axios.delete(`{BACKEND_URL}${id}`).then((response) => {
           const deletedItem = response.data;
           console.log('Было:',items)
           const newItems = items.filter((item) => {
@@ -67,9 +67,13 @@ function App() {
   };
 
   useEffect(() => {
-      console.log(searchValue)
-      axios.get(`${BACKEND_URL}/todos/?filter=${searchValue}`).then((response) => {
-          setItems(response.data);
+      axios.get(`${BACKEND_URL}`, {
+        headers:{ 
+          Authorization: `Bearer ffc4c81a6a3aa9ae100b7f4dc0a15f2d730a6acc`
+        }
+      }).then((response) => {
+        console.log(response)
+        setItems(response.data);
       })
   }, [searchValue])
 
@@ -103,7 +107,7 @@ function App() {
                   className="todo-list-item-label"
                   onClick={() => toggleItemDone(item)}
                 >
-                  {item.label}
+                  {item.content}
                 </span>
 
                 <button
